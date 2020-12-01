@@ -1,15 +1,15 @@
 const fs = require('fs')
 
-let findNumbersMultiple = (nums, callback) => {
+let findNumbersMultiple = (nums) => {
 
     // look through the array, 
     // for each number n see if (2020-n) is present. 
     // If so, multiply numbers together and that's our answer
-    nums.forEach(n => {
-        if(nums.includes(2020-n)) {
-            callback(n * (2020-n));
+    return nums.find(n => {
+        if (nums.includes(2020-n)) {
+            return true;
         }
-    });
+    })
 };
 
 // open the input file with the input data
@@ -23,9 +23,7 @@ fs.readFile('input', 'utf-8', (error, data) => {
         return +n;
     });
 
-    findNumbersMultiple(nums, answer => {
-        console.log(answer);
-    });
+    let n = findNumbersMultiple(nums);
+    console.log(n * (2020-n));
     
-
 });
