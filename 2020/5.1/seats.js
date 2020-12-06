@@ -8,11 +8,11 @@ let bisectSeats = function(str, position, lastPosition, begin, end) {
             return end;
         }
     } else {
-        let size = (end - begin)/2;
+        let mid = Math.floor((begin + end)/2);
         if(str[position] === 'F' || str[position] === 'L') {
-            return bisectSeats(str, ++position, lastPosition, begin, begin + Math.ceil(size));
+            return bisectSeats(str, ++position, lastPosition, begin, mid);
         } else if(str[position] === 'B' || str[position] === 'R') {
-            return bisectSeats(str, ++position, lastPosition, begin + Math.floor(size), end);
+            return bisectSeats(str, ++position, lastPosition,  mid + 1, end);
         }
     }
 }
