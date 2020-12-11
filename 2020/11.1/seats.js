@@ -49,7 +49,7 @@ let checkSeat = function(seats, x, y) {
 
 fs.readFile('input', 'utf-8', (err, data) => {
     let lines = data.split(/\r?\n/);
-    lines = input.split(/\r?\n/);
+    //lines = input.split(/\r?\n/);
     lines.forEach((l, i) => {
         seats.push(new Array(l.length));
         newSeats.push(new Array(l.length));
