@@ -24,14 +24,11 @@ let seatsChanged = function(newSeats, oldSeats) {
 
 let checkSeat = function(seats, x, y) {
     let countOccupied = 0;
-    let countEmpty = 0;
     for(let i = -1; i <= 1; i++) {
         for(let j = -1; j <= 1; j++) {
             if(!(i ===  0 && j === 0)) {
-                if(x + i >= 0 && y + j >= 0 && x + i < seats.length && y + j < seats.length) {
-                    if(seats[x+i][y+j] === 'L') {
-                        countEmpty++;
-                    } else if(seats[x+i][y+j] === '#') {
+                if((x + i) >= 0 && (y + j) >= 0 && (x + i) < seats.length && (y + j) < seats[x+i].length) {
+                    if(seats[x+i][y+j] === '#') {
                         countOccupied++;
                     }
                 }
@@ -57,23 +54,28 @@ fs.readFile('input', 'utf-8', (err, data) => {
             newSeats[i][j] =l[j];
         }
     });
-    console.log(newSeats);
+    let count = 0;
     do {
         newSeats.forEach((sR, i) => {
             sR.forEach((s, j) => {
                 seats[i][j] = newSeats[i][j];
+            });
+        });
+        newSeats.forEach((sR, i) => {
+            sR.forEach((s, j) => {
                 newSeats[i][j] = checkSeat(seats, i, j);
             });
         });
+        count++;
     } while(seatsChanged(newSeats, seats));
-    console.log(newSeats);
+    console.log(count);
     let countOccupied = 0;
-    newSeats.forEach(sR => {
-        sR.forEach(s => {
-            if(s === '#') {
+    for(let i = 0; i < newSeats.length; i++) {
+        for(let j = 0; j < newSeats[i].length; j++) {
+            if(newSeats[i][j] === '#') {
                 countOccupied++;
             }
-        });
-    });
+        }
+    }
     console.log(countOccupied);
 });
