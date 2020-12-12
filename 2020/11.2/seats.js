@@ -14,6 +14,19 @@ LLLLLLLLLL
 L.LLLLLL.L
 L.LLLLL.LL`;
 
+let outputSeats = function(seats) {
+    let str = '';
+    seats.forEach(s => {
+        str += s.join('');
+        str += '\n';
+    });
+    return str;
+}
+
+let validSeat = function(seats, x, y) {
+    return (x >= 0) && (y >= 0) && (x < seats.length) && (y < seats[x].length);
+}
+
 let seatsChanged = function(newSeats, oldSeats) {
     return newSeats.some((nSR, i) => {
         return nSR.some((nSC, j) => {
@@ -22,96 +35,62 @@ let seatsChanged = function(newSeats, oldSeats) {
     })
 }
 
+let canSeeOccupied = function(seats, x, y, dx, dy) {
+    while (validSeat(seats, x+dx, y+dy)) {
+        x = x+dx;
+        y = y+dy;
+        if(seats[x][y] === '#') {
+            return true;
+        } else if(seats[x][y] === 'L') {
+            return false;
+        }
+    }
+    return  false;
+}
+
+
 let checkSeat = function(seats, x, y) {
     let countOccupied = 0;
     // check north
-    if(x > 0) {
-        for(let i = x-1; i >= 0; i--) {
-            if(seats[i][y] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x][i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, -1, 0)) {
+        // console.log(`x: ${x}, y: ${y}, north can see occupied`);
+        countOccupied++;
     }
     // check south
-    if(x < seats.length) {
-        for(let i = x+1; i < seats.length; i++) {
-            if(seats[i][y] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[i][y] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, 1, 0)) {
+        // console.log(`x: ${x}, y: ${y}, south can see occupied`);
+        countOccupied++;
     }
     // check west
-    if(y > 0) {
-        for(let i = y-1; i >= 0; i--) {
-            if(seats[x][i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x][i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, 0, -1)) {
+        // console.log(`x: ${x}, y: ${y}, west can see occupied`);
+        countOccupied++;
     }
     // check east
-    if(y < seats[x].length) {
-        for(let i = y+1; i < seats[x].length; i++) {
-            if(seats[x][i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x][i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, 0, 1)) {
+        // console.log(`x: ${x}, y: ${y}, east can see occupied`);
+        countOccupied++;
     }
     // check north-west
-    if(x > 0 && y > 0) {
-        for(let i = 1; (x-i >= 0) && (y-i >= 0); i++) {
-            if(seats[x-i][y-i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x-i][y-i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, -1, -1)) {
+        // console.log(`x: ${x}, y: ${y}, north-west can see occupied`);
+        countOccupied++;
     }
     // check north-east
-    if(x > 0 && y < seats[x].length) {
-        for(let i = 1; (x-i >= 0) && (y+i < seats[x-i].length); i++) {
-            if(seats[x-i][y+i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x-i][y+i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, -1, 1)) {
+        // console.log(`x: ${x}, y: ${y}, north-east can see occupied`);
+        countOccupied++;
     }
     // check south-west
-    if(x < seats.length && y > 0) {
-        for(let i = 1; (x+i < seats.length) && (y-i >= 0); i++) {
-            if(seats[x+i][y-i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x+i][y-i] === 'L') {
-                break;
-            }
-        }
+    if(canSeeOccupied(seats, x, y, 1, -1)) {
+        // console.log(`x: ${x}, y: ${y}, south-west can see occupied`);
+        countOccupied++;
     }
     // check south-east
-    if(x < seats.length && y < seats[x].length) {
-        for(let i = 1; (x+i < seats.length) && (y+i < seats[x+i].length); i++) {
-            if(seats[x+i][y+i] === '#') {
-                countOccupied++;
-                break;
-            } else if(seats[x+i][y+i] === 'L') {
-                break;
-            }
-        }
-    }    
+    if(canSeeOccupied(seats, x, y, 1, 1)) {
+        // console.log(`x: ${x}, y: ${y}, south-east can see occupied`);
+        countOccupied++;
+    }  
     if(seats[x][y] === 'L' && countOccupied === 0) {
         return '#';
     } else if (seats[x][y] === '#' && countOccupied >= 5) {
@@ -144,8 +123,11 @@ fs.readFile('input', 'utf-8', (err, data) => {
             });
         });
         count++;
+        //console.log(count);
+        //console.log(outputSeats(newSeats));
     } while(seatsChanged(newSeats, seats));
-    //} while(count < 6);
+    
+    //} while(count < 2);
     console.log(count);
     let countOccupied = 0;
     for(let i = 0; i < newSeats.length; i++) {
