@@ -1,12 +1,11 @@
 const { start } = require("repl");
 
-let starting_numbers = [5,2,8,16,18,0,1];
+let starting_numbers = [0,3,6];
 
 let memory = {};
 
 for(let i = 0; i < starting_numbers.length; i++) {
     memory[starting_numbers[i]] = [i+1];
-    console.log(starting_numbers[i]);
 }
 
 let last_number = starting_numbers[starting_numbers.length-1];
@@ -31,6 +30,6 @@ for(let i = starting_numbers.length; i < 2020; i++) {
             }
             last_number = speak;
         }
-        console.log(last_number);
     }
 }
+console.log(last_number);
