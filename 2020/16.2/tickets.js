@@ -68,6 +68,7 @@ fs.readFile('input', 'utf-8', (err, data) => {
     });
     let numValues = validTickets[0].length;
 
+    // get all the values for a given index in the ticket and store them together
     let pivot = [];
     for(let i = 0; i < numValues; i++) {
         pivot[i] = [];
@@ -78,6 +79,7 @@ fs.readFile('input', 'utf-8', (err, data) => {
         });
     });
 
+    // remove all the possible positions for a definition
     let reduceTo1 = function(i) {
         for(let definition in ranges) {
             if(ranges[definition].position.includes(i)) {
@@ -86,6 +88,7 @@ fs.readFile('input', 'utf-8', (err, data) => {
         }
     }
 
+    // check to see if there are any indexes that can only be in one place
     let findOnlyPosition = function(numOptions) {
         let possiblePositions = [];
         for(let i = 0; i < numOptions; i++) {
@@ -94,6 +97,7 @@ fs.readFile('input', 'utf-8', (err, data) => {
             }).length;
             possiblePositions[i] = numPossible;
         }
+        // if there are, remove all the other possible position
         for(let i = 0; i < possiblePositions.length; i++) {
             if(possiblePositions[i] === 1) {
                 reduceTo1(i);
@@ -101,6 +105,7 @@ fs.readFile('input', 'utf-8', (err, data) => {
         }
     }
 
+    // are there any definitions that could be in more than one place?
     let hasMultipleOptions =function() {
         return Object.values(ranges).some((r => {
             return r.position.length > 1;
