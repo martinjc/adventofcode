@@ -1,8 +1,13 @@
-const { create } = require("domain");
 
-const input = `.#.
-..#
-###`;
+
+const input = `#.......
+.#..#..#
+....#.#.
+.##..#.#
+#######.
+#...####
+###.##..
+.##.#.#.`;
 
 // z
 space = [];
@@ -14,10 +19,6 @@ lines = input.split(/\r?\n/);
     x = l.split('');
     space[0][y] = x;
 });
-
-let validCell = function(space, z, y, x) {
-    return (z >= 0 && z < space.length && y >= 0 && y < space[z].length && x >= 0 && x < space[z][y].length);
-}
 
 let printSpace = function(space) {
     space.forEach((zi, z) => {
@@ -52,24 +53,36 @@ let createNewPlane = function(xDim, yDim) {
     return newDim;
 }
 
+let expandExistingSpace = function(space, xDim) {
+    space.forEach(zi => {
+        zi.unshift([]);
+        zi.push([]);
+        zi.forEach(yi => {
+            if(yi.length > 0) {
+                yi.unshift('.');
+                yi.push('.');
+            } else {
+                for(let x = 0; x < xDim; x++) {
+                    yi.push('.');
+                }
+            }
+        });
+    });
+}
+
 let checkNeighbours = function(space, z, y, x) {
     let activeCount = 0;
-    let neighbourCount = 0;
     for(let zd = -1; zd <= 1; zd++) {
         for(let yd = -1; yd <= 1; yd++) {
             for(let xd = -1; xd <= 1; xd++) {
-                if(validCell(space, z+zd, y+yd, x+xd)) {
-                        neighbourCount++;
-                    //if((z+zd) !== z && (y + yd) !== y && (x + xd) !== x) {
-                        if(space[z+zd][y+yd][x+xd] === '#') {
-                            activeCount++;
-                        }
-                    //}
-                }   
+                if(!((z+zd) === z && (y + yd) === y && (x + xd) === x)) {
+                    if(space[z+zd][y+yd][x+xd] === '#') {
+                        activeCount++;
+                    }
+                }
             }
         }
     }
-    console.log(`${z}, ${y}, ${x}, ${neighbourCount}, ${activeCount}`);
     if(space[z][y][x] === '#') {
         if (activeCount === 2 || activeCount === 3) {
             return '#';
@@ -93,7 +106,11 @@ let step = function(space, zDim, yDim, xDim) {
     for(let zi = 0; zi < zDim; zi++) {
         for(let yi = 0; yi < yDim; yi++) {
             for(let xi = 0; xi< xDim; xi++) {
-                newSpace[zi][yi][xi] = checkNeighbours(space, zi, yi, xi);
+                if(zi > 0 && yi > 0 && xi > 0 && zi < zDim-1 && yi < yDim-1 && xi < xDim-1) {
+                    newSpace[zi][yi][xi] = checkNeighbours(space, zi, yi, xi);
+                } else {
+                    newSpace[zi][yi][xi] = space[zi][yi][xi];
+                }
             }
         }
     }
@@ -102,6 +119,8 @@ let step = function(space, zDim, yDim, xDim) {
 }
 
 console.log('starting')
+printSpace(space);
+expandExistingSpace(space, space[0][0].length+2);
 printSpace(space);
 
 
@@ -114,33 +133,33 @@ space.push(createNewPlane(currentXDim, currentYDim));
 
 let currentZDim = space.length;
 
-console.log('creating room');
 printSpace(space);
 
-// here is where we check neighbours for the cycle
-space = step(space, currentZDim, currentYDim, currentXDim);
-
-console.log('calculated neighbours')
 printSpace(space);
 
-let newXDim = currentXDim + 2;
-let newYDim = currentYDim + 2;
-let newZDim = currentZDim + 2;
+for(let cycle = 0; cycle < 6; cycle++) {
+    expandExistingSpace(space, space[0][0].length+2);
+    printSpace(space);
+    currentXDim = space[0][0].length;
+    currentYDim = space[0].length;
+    space.unshift(createNewPlane(currentXDim, currentYDim));
+    space.push(createNewPlane(currentXDim, currentYDim));
+    currentZDim = space.length;
+    printSpace(space);
+    // here is where we check neighbours for the cycle
+    space = step(space, currentZDim, currentYDim, currentXDim);
+    console.log('calculated neighbours')
+    printSpace(space);    
+}
 
+let total = 0;
 space.forEach(zi => {
-    zi.unshift([]);
-    zi.push([]);
     zi.forEach(yi => {
-        if(yi.length > 0) {
-            yi.unshift('.');
-            yi.push('.');
-        } else {
-            for(let x = 0; x < newXDim; x++) {
-                yi.push('.');
+        yi.forEach(xi => {
+            if(xi === '#') {
+                total += 1;
             }
-        }
-
+        });
     });
 });
-
-printSpace(space);
+console.log(total);
