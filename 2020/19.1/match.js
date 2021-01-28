@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('fs');
+const { rawListeners } = require('process');
 
 const input = `0: 4 1 5
 1: 2 3 | 3 2
@@ -13,38 +14,37 @@ abbbab
 aaabbb
 aaaabbb`;
 
-let rules = {}
+let rules = [];
 
-let rulesHaveKeys = function() {
-    return Object.values(rules).some(r => {
-        return Object.keys(rules).some(k => {
-            return r.includes(k);
-        })
-    });
-}
 
 let extract_rule = function(l) {
-    let key = l[0];
+    let index = +l[0];
     let rule = l.split(': ')[1];
-    rules[key] = rule;
+    while(rule.includes('"')) {
+        rule = rule.replace('"', '');
+    }
+    while(rule.includes(' ')) {
+        rule = rule.replace(' ', '');
+    }
+    rules[index] = rule;
 }
 
 let reduceRules = function() {
-    //while(rulesHaveKeys()) {
-        Object.values(rules).forEach(r => {
-            console.log(r);
-            Object.keys(rules).forEach(k => {
-                console.log(k);
-                if(r.includes(k)) {
-                    console.log(k, r, rules[k]);
-                    console.log(r.replace(k, rules[k]))
-                    rules[k] = r.replace(k, `(${rules[k]})`);
-                }
-            });
-        });
-    //
+    let a = rules.findIndex(r => r === 'a');
+    let b = rules.findIndex(r => r === 'b');
+    rules = rules.map(r => {
+        while(r.includes(a)) {
+            r = r.replace(a, rules[a]);
+        }
+        return r;
+    });
+    rules = rules.map(r => {
+        while(r.includes(b)) {
+            r = r.replace(b, rules[b]);
+        }
+        return r;
+    });
 }
-
 
 fs.readFile('input', 'utf-8', (err, data) => {
     let lines = input.split(/\r?\n/);
@@ -58,6 +58,6 @@ fs.readFile('input', 'utf-8', (err, data) => {
     reduceRules();
     console.log(rules);
 
-    console.log(rulesHaveKeys());
+    //console.log(rulesHaveKeys());
 
 })
