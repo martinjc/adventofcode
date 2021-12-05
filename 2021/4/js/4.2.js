@@ -48,18 +48,33 @@ for (let i = 0; i < board_input.length; i += 6) {
 }
 
 function findBoard(boards, numbers) {
-    for (let i = 0; i < numbers.length; i++) {
-        for (let j = 0; j < boards.length; j++) {
+
+    let wins = new Array(boards.length).fill(0);
+
+    for (let j = 0; j < boards.length; j++) {
+        for (let i = 0; i < numbers.length; i++) {
             let found = boards[j].checkNumbers(numbers.slice(0, i));
             if (found) {
-                return [boards[j], j, i];
+                wins[j] = i;
+                break;
             }
         }
     }
+
+    let maxWin = 0;
+    let maxWinBoard = 0;
+    for (let i = 0; i < wins.length; i++) {
+        if (wins[i] > maxWin) {
+            maxWin = wins[i];
+            maxWinBoard = i;
+        }
+    }
+    return [boards[maxWinBoard], maxWinBoard, maxWin];
 }
 
 result = findBoard(boards, numbers);
 console.log(result);
+console.log(numbers[result[2] - 1]);
 let sum = result[0].filterAndSum(numbers.slice(0, result[2]));
 console.log(sum, numbers[result[2]-1], sum * numbers[result[2]-1]);
 
