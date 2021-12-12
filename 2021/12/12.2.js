@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path/posix');
 
 const data = fs.readFileSync('input', 'utf-8');
 let rows = data.split(/\r?\n/);
@@ -21,6 +22,11 @@ console.log(edges);
 
 let paths = [];
 
+function checkTwoSmall(path) {
+    let lowerCase = path.filter(f => f === f.toLowerCase());
+    return lowerCase.some(l => path.filter(f => f === l).length > 1);
+}
+
 function dfs(current, currentPath) {
     currentPath.push(current);
     let numPaths = 0;
@@ -35,7 +41,7 @@ function dfs(current, currentPath) {
         } else if (destination === destination.toUpperCase()) {
             numPaths += dfs(destination, new Array(...currentPath));
         // it must be a lowercase, check we've not already been there
-        } else if (!(currentPath.includes(destination))) {
+        } else if (!(currentPath.includes(destination)) || (currentPath.includes(destination) && !checkTwoSmall(currentPath))) {
             numPaths += dfs(destination, new Array(...currentPath));
         }
     }
@@ -43,4 +49,4 @@ function dfs(current, currentPath) {
 }
 
 console.log(dfs("start", new Array()));
-//console.table(paths);
+console.table(paths);
