@@ -7,14 +7,25 @@ let chitons = [];
 let visited = [];
 let distances = [];
 
+let strip = [];
 rows.forEach(r => {
-    chitons.push(r.split('').map(n => +n));
-    visited.push(new Array(r.split('').length).fill(0));
-    distances.push(new Array(r.split('').length).fill(Number.MAX_SAFE_INTEGER));
+    initial = r.split('').map(n => +n);
+    for (let i = 1; i < 5; i++) {
+        initial = initial.concat(r.split('').map(n => +n + i <= 9 ? +n + i : ((+n + i) - 9)));
+    }
+    strip.push(initial);
 });
 
-// console.table(chitons);
-// console.table(visited);
+for (let i = 0; i < 5; i++) {
+    strip.forEach(s => {
+        chitons.push(s.map(n => +n + i <= 9 ? +n + i : ((+n + i) - 9)));
+    });
+}
+
+for (let i = 0; i < chitons.length; i++) {
+    visited.push(new Array(chitons[0].length).fill(0));
+    distances.push(new Array(chitons[0].length).fill(Number.MAX_SAFE_INTEGER));
+}
 
 let startX = 0;
 let startY = 0;
@@ -58,7 +69,6 @@ function lowestUnvisited(visited, distances) {
 }
 
 let c = [0, 0];
-let step = 0;
 while (visited[destY][destX] === 0) {
     neighbours = getNeighbourCoords(chitons, c[0], c[1], visited);
     neighbours.forEach(n => {
@@ -71,14 +81,8 @@ while (visited[destY][destX] === 0) {
     newCoords = [];
 
     visited[c[1]][c[0]] = 1;
-    //console.table(distances);
-    //console.table(visited);
-
     c = lowestUnvisited(visited, distances);
     step++;
 }
-
-console.table(visited);
-console.table(distances);
 
 console.log(distances[destY][destX]);
