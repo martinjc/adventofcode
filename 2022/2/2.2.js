@@ -4,7 +4,7 @@ let input = fs.readFileSync('input', 'utf-8').split('\n');
 
 /*
 A = Rock, B = Paper, C = Scissors
-X = Rock, Y = Paper, Z = Scissors
+X = Lose, Y = Draw, Z = Win
 */
 
 let shapeScores = {"Rock": 1, "Paper": 2, "Scissors": 3};
