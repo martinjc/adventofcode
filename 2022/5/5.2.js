@@ -18,9 +18,13 @@ for(line of input) {
     let source = tokens[3]-1;
     let destination = tokens[5]-1;
 
+    let values = [];
     for(let i = 0; i < count; i++) {
-        let value = stacks[source].pop();
-        stacks[destination].push(value);
+        values.push(stacks[source].pop());
+    }
+    values = values.reverse();
+    for(let i = 0; i < values.length; i++) {
+        stacks[destination].push(values[i]);
     }
 }
 
