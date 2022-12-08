@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { setFlagsFromString } = require('v8');
 
 let input = fs.readFileSync('input', 'utf-8').split('\n');
 
@@ -57,20 +58,25 @@ function findSize(path, directory, sizes) {
 
 
 
-for ([key, value] of Object.entries(structure['/'])) {
-    let path = '/';
+for ([key, value] of Object.entries(structure)) {
+    let path = '';
     if (key !== '..') {
-        path = `${path}-${key}`
+        path = `${key}`
         sizes[key] = findSize(path, value, sizes);
     }
 }
 
 console.log(sizes);
 
-let count = 0;
-for(let value of Object.values(sizes)) {
-    if(value <= 100000) {
-        count += value;
+let freespace = 70000000 - sizes['/'];
+console.log(freespace);
+let needed = 30000000 - freespace;
+console.log(needed);
+
+let smallest_size = sizes['/'];
+for (let [key, value] of Object.entries(sizes)) {
+    if ((value >= needed) && (value < smallest_size)) {
+        smallest_size = value;
     }
 }
-console.log(count);
+console.log(smallest_size);
