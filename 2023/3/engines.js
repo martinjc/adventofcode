@@ -1,68 +1,58 @@
 let fs = require('fs')
 
-const re = /\d+/g;
-const symbols = /[^\d.]/;
+const numbers = /\d+/g;
+const symbols = /[^\d.]/g;
 
-let input = fs.readFileSync('input', 'utf-8').split('\n');
-input = input.map(line => `.${line}.`);
+let input = fs.readFileSync('input', 'utf-8').split('\n').map(line => `.${line}.`);
+const lineLength = input[0].length;
+input.splice(0, 0, '.'.repeat(lineLength));
+input.push('.'.repeat(lineLength));
 
-let parts = [];
-let missing = [];
-let lineCounter = 0;
-let sum = 0;
+let data = [];
 
-function checkNeighboursForSymbol(startX, endX, y) {
-    if(y > 0) {
-        let rowAbove = input[y - 1].substring(Math.max(startX-1,0), Math.min(endX+1, input[y - 1].length));
-        if(symbols.test(rowAbove)) {
-            console.log('above', rowAbove, symbols.test(rowAbove));
-            return true;
-        }
+class Symbol {
+    constructor(symbol, x, y) {
+        this.symbol = symbol;
+        this.x = x;
+        this.y = y;
+        this.neighbours = [];
     }
-    if(startX > 0) {
-        let left = input[y].substring(startX - 1, startX);
-        if(symbols.test(left)) {
-            console.log('left', left, symbols.test(left))
-            return true;
-        }
-    }
-    if(endX < input[y].length) {
-        let right = input[y].substring(endX, endX + 1);
-        if(symbols.test(right)) {
-            console.log('right', right, symbols.test(right))
-            return true;
-        }
-    }
-    if(y < input.length-1) {
-        let rowBelow = input[y + 1].substring(Math.max(startX-1,0), Math.min(endX+1, input[y + 1].length));
-        if(symbols.test(rowBelow)) {
-            console.log('below', rowBelow, symbols.test(rowBelow));
-            return true;
-        }
-    }
-    return false;
 }
 
-for(line of input) {
-    console.log(line);
-    let matches = line.match(re);
+input.forEach((line, r) => {
+    let matches = line.matchAll(symbols);
     console.log(matches);
-    if(matches !== null) {
-        for(match of matches) {
-            let start = line.indexOf(match);
-            let end = start + match.length;
-            console.log(match, start, end);
-            if(checkNeighboursForSymbol(start, end, lineCounter)) {
-                sum += +match;
-                parts.push(match);        
-            } else {
-                missing.push(match);
+    for(m of matches) {
+        data.push(new Symbol(m[0], m.index, r));
+    }
+});
+
+console.log(data);
+
+for(s of data) {
+    for(let i = s.y - 1; i <= s.y + 1; i++) {
+        let neighbourMatches = input[i].matchAll(numbers);
+        for(m of neighbourMatches) {
+            if(s.x >= m.index-1 && s.x <= m.index + m[0].length) {
+                s.neighbours.push(+m[0]);
             }
         }
     }
-    lineCounter++;
-    console.log(lineCounter, sum);
 }
+
+console.log(data);
+
+let sum = data.reduce((acc, s) => {
+    return acc += s.neighbours.reduce((a, b) => a + +b, 0);
+}, 0);
+
 console.log(sum);
-//console.log(parts)
-console.log(missing);
+
+let gearratio = data.reduce((acc, s) => {
+    if(s.symbol === '*' && s.neighbours.length === 2) {
+        return acc += (s.neighbours[0] * s.neighbours[1]);
+    }
+    return acc;
+}, 0);
+
+console.log(gearratio);
