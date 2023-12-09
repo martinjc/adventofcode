@@ -3,37 +3,27 @@ let fs = require('fs')
 let input = fs.readFileSync('input', 'utf-8').split('\n');
 
 
-const instructions = input[0].split('').map(i =>  i === 'R' ? 1 : 0);
+const instructions = input[0].split('').map(i =>  i === 'L' ? 1 : 2);
 input = input.slice(2);
+console.log(instructions);
 
-//console.log(instructions);
-//console.log(input);
-
-let counter = 0;
-let node = input[0].substring(0,3);
-let links = input[0].substring(7, 15).split(', ');
-let instructionCount = 0;
-let instruction = instructions[instructionCount];
-
+let currentNode = input.find(i => i.substring(0, 3) === 'AAA').match(/[A-Z]{3}/g);
+let instructionNumber = 0;
+let instruction = instructions[instructionNumber];
 let step = 0;
 
-//console.log(node);
-//console.log(links);
-
-while(node !== 'ZZZ') {
+while(currentNode[0] !== 'ZZZ') {
+    console.log(currentNode, instruction);
     step++;
-    let next = input.find(i => i.substring(0, 3) === links[instruction]);
-    //console.log(next);
-    node = next.substring(0,3);
-    links = next.substring(7, 15).split(', ');
+    currentNode = input.find(i => i.substring(0, 3) === currentNode[instruction]).match(/[A-Z]{3}/g);
 
-    if(instructionCount < instructions.length - 1) {
-        instructionCount++;
+    if(instructionNumber < instructions.length-1) {
+        instructionNumber++;
     } else {
-        instructionCount = 0;
+        instructionNumber = 0;
     }
-
-    instruction = instructions[instructionCount];
+    console.log(instructionNumber);
+    instruction = instructions[instructionNumber];
 }
 
 console.log(step);
